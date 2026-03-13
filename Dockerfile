@@ -34,6 +34,7 @@ WORKDIR /go/src/github.com/mayswind/ezbookkeeping
 COPY . .
 RUN docker/frontend-build-pre-setup.sh
 RUN apk add git
+RUN git init && git config user.email "build@docker" && git config user.name "Docker Build" && git add -f . && git commit -m "initial"
 RUN ./build.sh frontend
 
 # Package docker image
