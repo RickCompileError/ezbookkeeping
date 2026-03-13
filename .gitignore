@@ -158,6 +158,7 @@ package/
 **/.env
 
 # Other directories
-data/
-storage/
-log/
+/data/
+/storage/
+/log/
+
