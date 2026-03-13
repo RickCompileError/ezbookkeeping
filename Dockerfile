@@ -1,7 +1,5 @@
 # Build backend binary file
 FROM golang:1.26.2-alpine3.23 AS be-builder
-ARG BUILDPLATFORM
-FROM golang:1.25.7-alpine3.23 AS be-builder
 ARG RELEASE_BUILD
 ARG BUILD_PIPELINE
 ARG BUILD_UNIXTIME
@@ -23,7 +21,7 @@ RUN GOWORK=off ./build.sh backend --no-lint --no-test
 RUN chmod +x /go/src/github.com/mayswind/ezbookkeeping/ezbookkeeping
 
 # Build frontend files
-FROM --platform=$BUILDPLATFORM node:24.15.0-alpine3.23 AS fe-builder
+FROM node:24.14.0-alpine3.23 AS fe-builder
 ARG RELEASE_BUILD
 ARG BUILD_PIPELINE
 ARG BUILD_UNIXTIME
