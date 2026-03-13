@@ -1,5 +1,6 @@
 # Build backend binary file
 FROM golang:1.26.2-alpine3.23 AS be-builder
+ARG BUILDPLATFORM
 ARG RELEASE_BUILD
 ARG BUILD_PIPELINE
 ARG BUILD_UNIXTIME
