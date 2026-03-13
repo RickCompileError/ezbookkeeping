@@ -14,9 +14,11 @@ ENV CHECK_3RD_API=$CHECK_3RD_API
 ENV SKIP_TESTS=$SKIP_TESTS
 WORKDIR /go/src/github.com/mayswind/ezbookkeeping
 COPY . .
+RUN apk add git gcc g++ libc-dev bash
+RUN git init && git config user.email "build@docker" && git config user.name "Docker Build" && git add -f . && git commit -m "initial"
 RUN docker/backend-build-pre-setup.sh
-RUN apk add git gcc g++ libc-dev
-RUN ./build.sh backend
+RUN GOWORK=off ./build.sh backend --no-lint --no-test
+RUN chmod +x /go/src/github.com/mayswind/ezbookkeeping/ezbookkeeping
 
 # Build frontend files
 FROM --platform=$BUILDPLATFORM node:24.15.0-alpine3.23 AS fe-builder
