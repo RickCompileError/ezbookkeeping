@@ -1,0 +1,17 @@
+services:
+  ezbookkeeping:
+    build:
+      context: .
+    ports:
+      - "${EBK_HTTP_PORT:-8080}:8080"
+    volumes:
+      - ezbookkeeping-data:/ezbookkeeping/data
+      - ./conf/ezbookkeeping.ini:/ezbookkeeping/conf/ezbookkeeping.ini:ro
+    env_file:
+      - .env
+    environment:
+      LITESTREAM_DB_PATH: /ezbookkeeping/data/ezbookkeeping.db
+    restart: unless-stopped
+
+volumes:
+  ezbookkeeping-data:

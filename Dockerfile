@@ -1,3 +1,6 @@
+# Litestream stage
+FROM litestream/litestream:latest AS litestream
+
 # Build backend binary file
 FROM golang:1.26.2-alpine3.23 AS be-builder
 ARG RELEASE_BUILD
@@ -39,7 +42,7 @@ FROM alpine:3.23.4
 LABEL maintainer="MaysWind <i@mayswind.net>"
 RUN addgroup -S -g 1000 ezbookkeeping && adduser -S -G ezbookkeeping -u 1000 ezbookkeeping
 RUN apk --no-cache add tzdata
-COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
+COPY docker/entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 RUN mkdir -p /ezbookkeeping && chown 1000:1000 /ezbookkeeping \
   && mkdir -p /ezbookkeeping/data && chown 1000:1000 /ezbookkeeping/data \
@@ -48,6 +51,7 @@ RUN mkdir -p /ezbookkeeping && chown 1000:1000 /ezbookkeeping \
 WORKDIR /ezbookkeeping
 COPY --from=be-builder --chown=1000:1000 /go/src/github.com/mayswind/ezbookkeeping/ezbookkeeping /ezbookkeeping/ezbookkeeping
 COPY --from=fe-builder --chown=1000:1000 /go/src/github.com/mayswind/ezbookkeeping/dist /ezbookkeeping/public
+COPY --from=litestream /usr/local/bin/litestream /usr/local/bin/litestream
 COPY --chown=1000:1000 conf /ezbookkeeping/conf
 COPY --chown=1000:1000 templates /ezbookkeeping/templates
 COPY --chown=1000:1000 LICENSE /ezbookkeeping/LICENSE
