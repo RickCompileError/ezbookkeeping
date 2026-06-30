@@ -22,12 +22,12 @@ LITESTREAM_REGION="${LITESTREAM_REGION:-auto}"
 LITESTREAM_ENDPOINT="${LITESTREAM_ENDPOINT}"
 LITESTREAM_RESTORE_IF_DB_MISSING="${LITESTREAM_RESTORE_IF_DB_MISSING:-true}"
 
+LITESTREAM_CONFIG_PATH="${LITESTREAM_CONFIG_PATH:-/ezbookkeeping/litestream.yml}"
+
 if [ -n "${LITESTREAM_REPLICA_URL}" ]; then
   echo "Setting up litestream replication..."
 
-  mkdir -p /etc/litestream
-
-  cat > /etc/litestream/litestream.yml <<-EOCFG
+  cat > "${LITESTREAM_CONFIG_PATH}" <<-EOCFG
 dbs:
   - path: ${LITESTREAM_DB_PATH}
     replicas:
@@ -35,19 +35,19 @@ dbs:
 EOCFG
 
   if [ -n "${LITESTREAM_ACCESS_KEY_ID}" ]; then
-    echo "        access-key-id: ${LITESTREAM_ACCESS_KEY_ID}" >> /etc/litestream/litestream.yml
+    echo "        access-key-id: ${LITESTREAM_ACCESS_KEY_ID}" >> "${LITESTREAM_CONFIG_PATH}"
   fi
 
   if [ -n "${LITESTREAM_SECRET_ACCESS_KEY}" ]; then
-    echo "        secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}" >> /etc/litestream/litestream.yml
+    echo "        secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}" >> "${LITESTREAM_CONFIG_PATH}"
   fi
 
   if [ -n "${LITESTREAM_REGION}" ]; then
-    echo "        region: ${LITESTREAM_REGION}" >> /etc/litestream/litestream.yml
+    echo "        region: ${LITESTREAM_REGION}" >> "${LITESTREAM_CONFIG_PATH}"
   fi
 
   if [ -n "${LITESTREAM_ENDPOINT}" ]; then
-    echo "        endpoint: ${LITESTREAM_ENDPOINT}" >> /etc/litestream/litestream.yml
+    echo "        endpoint: ${LITESTREAM_ENDPOINT}" >> "${LITESTREAM_CONFIG_PATH}"
   fi
 
   # Restore from replica if local DB missing
@@ -56,7 +56,7 @@ EOCFG
     litestream restore \
       -if-db-not-exists \
       -if-replica-exists \
-      -config /etc/litestream/litestream.yml \
+      -config "${LITESTREAM_CONFIG_PATH}" \
       "${LITESTREAM_DB_PATH}" \
       && echo "Restore successful." \
       || echo "No existing replica found. A new database will be created."
@@ -64,7 +64,7 @@ EOCFG
 
   # Start litestream replication in background
   echo "Starting litestream replication..."
-  litestream replicate -config /etc/litestream/litestream.yml &
+  litestream replicate -config "${LITESTREAM_CONFIG_PATH}" &
 fi
 
 # Start ezbookkeeping
